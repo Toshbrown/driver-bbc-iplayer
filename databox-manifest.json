@@ -1,0 +1,42 @@
+{
+	"manifest-version": 1,
+	"name": "driver-bbc-iplayer",
+	"version": "0.5.1",
+	"description": "A simple Databox driver to get user recommendations from bbc iPlayer",
+	"author": "Anthony Brown <Anthony.Brown@nottingham.ac.uk> ()",
+	"license": "MIT",
+	"databox-type": "driver",
+	"tags": [
+		"BBC",
+		"iPlayer"
+	],
+	"homepage": "https://github.com/me-box/driver-bbc-iplayer",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/me-box/driver-bbc-iplayer.git"
+	},
+
+	"external-whitelist": [
+		{
+			"urls": [
+				"https://session.bbc.co.uk/",
+				"https://account.bbc.com/",
+				"https://ibl.api.bbci.co.uk/"
+			],
+			"description": "Used to access iPlayer API"
+		}
+	],
+
+	"resource-requirements": {
+		"store": "core-store"
+	},
+
+	"provides": [
+		{
+			"data-source-type": "bbc::iplayer::user_recommendations",
+			"description": "user iplayer recommendations",
+			"store-type": "tsblob",
+			"schema": {}
+		}
+	]
+}
