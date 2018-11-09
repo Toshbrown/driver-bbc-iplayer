@@ -5,6 +5,10 @@ VERSION=latest
 .PHONY: all
 all: build-amd64 build-arm64v8 publish-images
 
+.PHONY: start
+start:
+	go run ./src/*.go
+
 .PHONY: build-amd64
 build-amd64:
 	docker build -t $(DEFAULT_REG)/$(IMAGE_NAME)-amd64:$(VERSION) . $(OPTS)
