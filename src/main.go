@@ -15,16 +15,20 @@ import (
 //default addresses to be used in testing mode
 
 const (
-	testArbiterEndpoint        = "tcp://127.0.0.1:4444"
-	testStoreEndpoint          = "tcp://127.0.0.1:5555"
-	RedirectHostInsideDatabox  = "https://driver-bbc-iplayer:8080"
-	RedirectHostOutsideDatabox = "http://127.0.0.1:8080"
+	testArbiterEndpoint    = "tcp://127.0.0.1:4444"
+	testStoreEndpoint      = "tcp://127.0.0.1:5555"
+	HostInsideDatabox      = "https://driver-bbc-iplayer:8080"
+	HostOutsideDatabox     = "http://127.0.0.1:8080"
+	BasePathInsideDatabox  = "/driver-bbc-iplayer"
+	BasePathOutsideDatabox = ""
 )
 
 var (
 	storeClient       *libDatabox.CoreStoreClient
 	userAuthenticated bool
 	stopChan          chan int
+	Host              string
+	BasePath          string
 )
 
 func main() {
@@ -35,12 +39,16 @@ func main() {
 	//Setup store client
 	var DataboxStoreEndpoint string
 	if DataboxTestMode {
+		Host = HostOutsideDatabox
+		BasePath = BasePathOutsideDatabox
 		DataboxStoreEndpoint = testStoreEndpoint
 		ac, _ := libDatabox.NewArbiterClient("./", "./", testArbiterEndpoint)
 		storeClient = libDatabox.NewCoreStoreClient(ac, "./", DataboxStoreEndpoint, false)
 		//turn on debug output for the databox library
 		libDatabox.OutputDebug(true)
 	} else {
+		Host = HostInsideDatabox
+		BasePath = BasePathOutsideDatabox
 		DataboxStoreEndpoint = os.Getenv("DATABOX_ZMQ_ENDPOINT")
 		storeClient = libDatabox.NewDefaultCoreStoreClient(DataboxStoreEndpoint)
 	}
