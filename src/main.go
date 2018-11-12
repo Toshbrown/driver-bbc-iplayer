@@ -216,6 +216,13 @@ func driverWork(token string) {
 		//libDatabox.Info("Data written to store: " + string(b))
 		libDatabox.Info("Storing data")
 
+		ret, rErr := storeClient.TSBlobJSON.Earliest("IplayerRecommend")
+		if rErr != nil {
+			libDatabox.Err("Error Write Datasource " + rErr.Error())
+		}
+
+		libDatabox.Info("Data written to store: " + string(ret))
+
 		//time.Sleep(time.Hour * 24)
 		time.Sleep(time.Second * 30)
 	}
