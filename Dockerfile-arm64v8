@@ -1,5 +1,5 @@
 
-FROM arm64v8/alpine as gobuild
+FROM arm64v8/alpine as build
 RUN apk update && apk add build-base pkgconfig go git libzmq zeromq-dev alpine-sdk libsodium-dev
 
 ENV GOPATH /
@@ -9,16 +9,18 @@ WORKDIR /
 RUN go get -u github.com/gorilla/mux
 RUN go get -u github.com/me-box/lib-go-databox
 RUN go get -u golang.org/x/net/publicsuffix
-COPY . .
+COPY /src /src
+COPY /static /static
 RUN addgroup -S databox && adduser -S -g databox databox
 RUN GGO_ENABLED=0 GOOS=linux go build -a -tags netgo -installsuffix netgo -ldflags '-s -w' -o driver /src/*.go
 
 FROM arm64v8/alpine
-COPY --from=gobuild /etc/passwd /etc/passwd
-RUN apk update && apk add libzmq
+COPY --from=build /etc/passwd /etc/passwd
+RUN apk update && apk add libzmq && apk add ca-certificates
 USER databox
 WORKDIR /
-COPY --from=gobuild /driver .
+COPY --from=build /driver /driver
+COPY --from=build /static /static
 LABEL databox.type="driver"
 EXPOSE 8080
 

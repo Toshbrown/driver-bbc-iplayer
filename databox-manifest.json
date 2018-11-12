@@ -21,7 +21,8 @@
 			"urls": [
 				"https://session.bbc.co.uk/",
 				"https://account.bbc.com/",
-				"https://ibl.api.bbci.co.uk/"
+				"https://ibl.api.bbci.co.uk/",
+				"https://www.bbc.co.uk"
 			],
 			"description": "Used to access iPlayer API"
 		}
