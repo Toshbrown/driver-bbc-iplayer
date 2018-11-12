@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -41,7 +40,7 @@ func statusEndpoint(w http.ResponseWriter, r *http.Request) {
 
 func registerData(testMode bool) {
 	//Setup store client
-	DataboxStoreEndpoint := "tcp://127.0.0.1:5555"
+	var DataboxStoreEndpoint string
 	if testMode {
 		DataboxStoreEndpoint = testStoreEndpoint
 		ac, _ := libDatabox.NewArbiterClient("./", "./", testArbiterEndpoint)
@@ -52,6 +51,23 @@ func registerData(testMode bool) {
 		DataboxStoreEndpoint = os.Getenv("DATABOX_ZMQ_ENDPOINT")
 		storeClient = libDatabox.NewDefaultCoreStoreClient(DataboxStoreEndpoint)
 	}
+	//Setup datastore for main data
+	recomDatasource := libDatabox.DataSourceMetadata{
+		Description:    "IPlayer Recommendation data", //required
+		ContentType:    libDatabox.ContentTypeJSON,    //required
+		Vendor:         "databox-test",                //required
+		DataSourceType: "recommendData",               //required
+		DataSourceID:   "IplayerRecommend",            //required
+		StoreType:      libDatabox.StoreTypeTSBlob,    //required
+		IsActuator:     false,
+		IsFunc:         false,
+	}
+	dErr := storeClient.RegisterDatasource(recomDatasource)
+	if dErr != nil {
+		libDatabox.Err("Error Registering Datasource " + dErr.Error())
+		return
+	}
+	libDatabox.Info("Registered Datasource")
 	//Setup authentication datastore
 	authDatasource := libDatabox.DataSourceMetadata{
 		Description:    "IPlayer Login Data",       //required
@@ -63,29 +79,12 @@ func registerData(testMode bool) {
 		IsActuator:     false,
 		IsFunc:         false,
 	}
-	err := storeClient.RegisterDatasource(authDatasource)
-	if err != nil {
-		libDatabox.Err("Error Registering Credential Datasource " + err.Error())
+	cErr := storeClient.RegisterDatasource(authDatasource)
+	if cErr != nil {
+		libDatabox.Err("Error Registering Credential Datasource " + cErr.Error())
 		return
 	}
 	libDatabox.Info("Registered Credential Datasource")
-	//Setup datastore for main data
-	testDatasource := libDatabox.DataSourceMetadata{
-		Description:    "IPlayer Recommendation data", //required
-		ContentType:    libDatabox.ContentTypeJSON,    //required
-		Vendor:         "databox-test",                //required
-		DataSourceType: "recommendData",               //required
-		DataSourceID:   "IplayerRecommend",            //required
-		StoreType:      libDatabox.StoreTypeTSBlob,    //required
-		IsActuator:     false,
-		IsFunc:         false,
-	}
-	err = storeClient.RegisterDatasource(testDatasource)
-	if err != nil {
-		libDatabox.Err("Error Registering Datasource " + err.Error())
-		return
-	}
-	libDatabox.Info("Registered Datasource")
 }
 
 func setUpWebServer(testMode bool, r *mux.Router, port string) {
@@ -202,26 +201,16 @@ func authCheck() (token string) {
 func driverWork(token string) {
 	for {
 		recommendations, err := GetRecommendations(token)
-
-		b, err := json.Marshal(recommendations)
 		if err != nil {
-			fmt.Println("Error ", err)
-			return
+			libDatabox.Err("Error Write Datasource " + err.Error())
 		}
 
-		aerr := storeClient.TSBlobJSON.Write("IplayerRecommend", b)
+		aerr := storeClient.TSBlobJSON.Write("IplayerRecommend", []byte(recommendations))
 		if aerr != nil {
 			libDatabox.Err("Error Write Datasource " + aerr.Error())
 		}
-		//libDatabox.Info("Data written to store: " + string(b))
+		//libDatabox.Info("Data written to store: " + recommendations)
 		libDatabox.Info("Storing data")
-
-		ret, rErr := storeClient.TSBlobJSON.Earliest("IplayerRecommend")
-		if rErr != nil {
-			libDatabox.Err("Error Write Datasource " + rErr.Error())
-		}
-
-		libDatabox.Info("Data written to store: " + string(ret))
 
 		//time.Sleep(time.Hour * 24)
 		time.Sleep(time.Second * 30)
