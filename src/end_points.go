@@ -16,7 +16,6 @@ func authUser(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	//Obtain user login details for their BCC account
 	for k, v := range r.Form {
-		libDatabox.Info("Writing " + k + " = " + strings.Join(v, ""))
 		err := storeClient.KVText.Write("IplayerCred", k, []byte(strings.Join(v, "")))
 		libDatabox.ChkErr(err)
 	}
