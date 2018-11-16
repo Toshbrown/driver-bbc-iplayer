@@ -48,7 +48,7 @@ func main() {
 		libDatabox.OutputDebug(true)
 	} else {
 		Host = HostInsideDatabox
-		BasePath = BasePathOutsideDatabox
+		BasePath = BasePathInsideDatabox
 		DataboxStoreEndpoint = os.Getenv("DATABOX_ZMQ_ENDPOINT")
 		storeClient = libDatabox.NewDefaultCoreStoreClient(DataboxStoreEndpoint)
 	}
