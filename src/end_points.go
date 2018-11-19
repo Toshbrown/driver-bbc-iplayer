@@ -23,7 +23,14 @@ func authUser(w http.ResponseWriter, r *http.Request) {
 	token := authCheck()
 
 	if token != "" {
-		http.Redirect(w, r, Host+"/ui/info", 302)
+		callbackUrl := r.FormValue("post_auth_callback")
+		PostAuthCallbackUrl := "/core-ui/ui/view/driver-bbc-iplayer/info"
+		if callbackUrl != "" {
+			PostAuthCallbackUrl = callbackUrl
+		}
+
+		fmt.Fprintf(w, "<html><head><script>window.parent.location = '%s';</script><head><body><body></html>", PostAuthCallbackUrl)
+
 		go driverWork(token, stopChan)
 		userAuthenticated = true
 	} else {
@@ -95,9 +102,9 @@ func index(w http.ResponseWriter, r *http.Request) {
 	<body>
 	  <h1>Authentication Form</h1>
 		<form action="` + BasePath + `/ui/auth" method="post">
-		  Username:<input type="text" name="email" required><br>
-			Password: <input type="password" name="password" required><br>
-				<input type="submit" value="Send">
+		Username:<input type="text" name="email" required><br>
+		Password: <input type="password" name="password" required><br>
+		<input type="submit" value="Login">
 	  </form>
 	</body>
 	</html>`
