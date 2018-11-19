@@ -71,7 +71,7 @@ func main() {
 	router.HandleFunc("/ui/logout", logout)
 	router.HandleFunc("/ui/info", info)
 	router.HandleFunc("/ui", index)
-	router.PathPrefix("/ui/*").Handler(http.StripPrefix("/ui", http.FileServer(http.Dir("./static"))))
+	router.PathPrefix("/ui/").Handler(http.StripPrefix("/ui", http.FileServer(http.Dir("./static"))))
 	setUpWebServer(DataboxTestMode, router, "8080")
 }
 
