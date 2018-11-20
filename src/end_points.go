@@ -65,8 +65,9 @@ func info(w http.ResponseWriter, r *http.Request) {
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-	<link rel="stylesheet" href="./ui/css/normalize.css">
-	<link rel="stylesheet" href="./ui/css/main.css">
+	<link rel="stylesheet" href="` + BasePath + `/ui/css/normalize.css">
+	<link rel="stylesheet" href="` + BasePath + `/ui/css/main.css">
+	<link rel="stylesheet" href="` + BasePath + `/ui/css/bbc.css">
 	</head>
 
 	<body>
@@ -97,14 +98,18 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 	  <link rel="stylesheet" href="` + BasePath + `/ui/css/normalize.css">
 	  <link rel="stylesheet" href="` + BasePath + `/ui/css/main.css">
+	  <link rel="stylesheet" href="` + BasePath + `/ui/css/bbc.css">
 	</head>
 
 	<body>
-	  <h1>Authentication Form</h1>
+	  	<div class="form-login">
+        <img class="logo" src="` + BasePath + `/ui/img/BBC_iPlayer_logo.svg" />
+        <p>Sign in with your BBC account to download your iPlayer recommendations.</p>
 		<form action="` + BasePath + `/ui/auth" method="post">
-		Username:<input type="text" name="email" required><br>
-		Password: <input type="password" name="password" required><br>
-		<input type="submit" value="Login">
+		<div class="row"> <label for="email">Email </label><input type="text" name="email" required></div>
+		<div class="row"> <label for="password">Password </label><input type="password" name="password" required></div>
+		<div class="row"> <input type="submit" class="btn-login" value="Sign in"></div>
+		</div>
 	  </form>
 	</body>
 	</html>`
