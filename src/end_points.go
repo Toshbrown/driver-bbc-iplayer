@@ -24,14 +24,21 @@ func authUser(w http.ResponseWriter, r *http.Request) {
 
 	if token != "" {
 		callbackUrl := r.FormValue("post_auth_callback")
-		PostAuthCallbackUrl := "/core-ui/ui/view/driver-bbc-iplayer/info"
+		PostAuthCallbackUrl := "/core-ui/ui/view/" + BasePath + "/info"
 		if callbackUrl != "" {
 			PostAuthCallbackUrl = callbackUrl
 		}
 
-		fmt.Fprintf(w, "<html><head><script>window.parent.location = '%s';</script><head><body><body></html>", PostAuthCallbackUrl)
+		if DataboxTestMode {
+			fmt.Fprintf(w, "<html><head><script>window.location = '%s';</script><head><body><body></html>", PostAuthCallbackUrl)
+		} else {
+			fmt.Fprintf(w, "<html><head><script>window.parent.location = '%s';</script><head><body><body></html>", PostAuthCallbackUrl)
+		}
 
-		go driverWork(token, stopChan)
+		if !isRunning {
+			StopChan = make(chan struct{})
+			go driverWork(token, StopChan)
+		}
 		userAuthenticated = true
 	} else {
 		fmt.Fprintf(w, "<h1>Auth Failed<h1>")
@@ -43,7 +50,9 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	storeClient.KVText.Delete("IplayerCred", "email")
 	storeClient.KVText.Delete("IplayerCred", "password")
 	userAuthenticated = false
-	stopChan <- 1
+	if isRunning {
+		close(StopChan)
+	}
 	http.Redirect(w, r, Host+"/ui", 302)
 }
 
@@ -88,6 +97,12 @@ func index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	callbackUrl := r.FormValue("post_auth_callback")
+	PostAuthCallbackUrl := "/core-ui/ui/view/" + BasePath + "/info"
+	if callbackUrl != "" {
+		PostAuthCallbackUrl = callbackUrl
+	}
+
 	body := `<!doctype html>
 	<head>
 	  <meta charset="utf-8">
@@ -105,12 +120,13 @@ func index(w http.ResponseWriter, r *http.Request) {
 	  	<div class="form-login">
         <img class="logo" src="` + BasePath + `/ui/img/BBC_iPlayer_logo.svg" />
         <p>Sign in with your BBC account to download your iPlayer recommendations.</p>
-		<form action="` + BasePath + `/ui/auth" method="post">
-		<div class="row"> <label for="email">Email </label><input type="text" name="email" required></div>
-		<div class="row"> <label for="password">Password </label><input type="password" name="password" required></div>
-		<div class="row"> <input type="submit" class="btn-login" value="Sign in"></div>
+			<form action="` + BasePath + `/ui/auth" method="post">
+				<div class="row"> <label for="email">Email </label><input autocomplete="off" type="text" name="email" required></div>
+				<div class="row"> <label for="password">Password </label><input autocomplete="off" type="password" name="password" required></div>
+				<div class="row"> <input type="submit" class="btn-login" value="Sign in"></div>
+				<input style="display: none" type="text" name="post_auth_callback" value="` + PostAuthCallbackUrl + `"/>
+			</form>
 		</div>
-	  </form>
 	</body>
 	</html>`
 

@@ -26,15 +26,16 @@ const (
 var (
 	storeClient       *libDatabox.CoreStoreClient
 	userAuthenticated bool
-	stopChan          chan int
+	StopChan          chan struct{}
+	isRunning         bool
 	Host              string
 	BasePath          string
+	DataboxTestMode   bool
 )
 
 func main() {
-	DataboxTestMode := os.Getenv("DATABOX_VERSION") == ""
+	DataboxTestMode = os.Getenv("DATABOX_VERSION") == ""
 	userAuthenticated = false
-	stopChan = make(chan int)
 
 	//Setup store client
 	var DataboxStoreEndpoint string
@@ -61,7 +62,8 @@ func main() {
 		if token != "" {
 			userAuthenticated = true
 			libDatabox.Info("Email and password retrieved form DB starting do driver work")
-			go driverWork(token, stopChan)
+			StopChan = make(chan struct{})
+			go driverWork(token, StopChan)
 		}
 	}()
 
@@ -170,7 +172,8 @@ func authCheck() (token string) {
 	return token
 }
 
-func driverWork(token string, stop chan int) {
+func driverWork(token string, stop chan struct{}) {
+	isRunning = true
 	for {
 		recommendations, err := GetRecommendations(token)
 		if err != nil {
@@ -187,6 +190,7 @@ func driverWork(token string, stop chan int) {
 		select {
 		case <-stop:
 			libDatabox.Info("Stopping data updates stop message received")
+			isRunning = false
 			return
 		case <-time.After(time.Hour * 1):
 			libDatabox.Info("updating data after time out")
