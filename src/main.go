@@ -67,7 +67,8 @@ func main() {
 
 	router := mux.NewRouter()
 	router.HandleFunc("/status", statusEndpoint).Methods("GET")
-	router.HandleFunc("/ui/auth", authUser)
+	router.HandleFunc("/ui/auth", index).Methods("GET")
+	router.HandleFunc("/ui/auth", authUser).Methods("POST")
 	router.HandleFunc("/ui/logout", logout)
 	router.HandleFunc("/ui/info", info)
 	router.HandleFunc("/ui", index)
