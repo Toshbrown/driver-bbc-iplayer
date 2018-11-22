@@ -21,6 +21,12 @@ body {
     width: 150px;
 }
 
+.img-episode {
+    width: 23%;
+    margin: 1%;
+    float: left;
+}
+
 .form-login {
     border : solid 1px #b2b7c4;
     margin: 10% auto 0 auto;

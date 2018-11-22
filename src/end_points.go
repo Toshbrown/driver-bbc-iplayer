@@ -57,6 +57,27 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, Host+"/ui", 302)
 }
 
+type Recommendations struct {
+	Version             string `json:"version"`
+	Schema              string `json:"schema"`
+	UserRecommendations struct {
+		Elements []struct {
+			Type      string `json:"type"`
+			Algorithm string `json:"algorithm"`
+			Episode   struct {
+				ID     string `json:"id"`
+				Live   bool   `json:"live"`
+				Type   string `json:"type"`
+				Title  string `json:"title"`
+				Images struct {
+					Type     string `json:"type"`
+					Standard string `json:"standard"`
+				} `json:"images"`
+			} `json:"episode"`
+		} `json:"elements"`
+	} `json:"user_recommendations"`
+}
+
 func info(w http.ResponseWriter, r *http.Request) {
 
 	recommendations, err := storeClient.KVJSON.Read("IplayerRecommend", "all")
@@ -64,6 +85,16 @@ func info(w http.ResponseWriter, r *http.Request) {
 
 	var prettyJSON bytes.Buffer
 	json.Indent(&prettyJSON, recommendations, "", "    ")
+
+	var recObj Recommendations
+	err = json.Unmarshal(recommendations, &recObj)
+	libDatabox.ChkErr(err)
+
+	images := ""
+	for _, el := range recObj.UserRecommendations.Elements {
+		img := strings.Replace(el.Episode.Images.Standard, "{recipe}", "432x243", 1)
+		images += `<a target="_blank" href="https://www.bbc.co.uk/iplayer/episode/` + el.Episode.ID + `"><img class="img-episode" src="` + img + `" /></a>`
+	}
 
 	body := `<!doctype html>
 	<html class="no-js" lang="">
@@ -81,13 +112,13 @@ func info(w http.ResponseWriter, r *http.Request) {
 	</head>
 
 	<body>
-	<h1>iPlayer driver loading recommendations!</h1>
+	<h1>iPlayer Recommendations</h1>
 	<div style="float:right"><a href="` + BasePath + `/ui/logout">logout</a></div>
 	<pre style="clear: both;">%s</pre>
 	</body>
 	</html>`
 
-	fmt.Fprintf(w, body, string(prettyJSON.Bytes()))
+	fmt.Fprintf(w, body, images)
 
 }
 
