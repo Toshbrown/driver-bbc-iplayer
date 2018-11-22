@@ -92,7 +92,7 @@ func registerData() {
 		Vendor:         "databox-test",                  //required
 		DataSourceType: "bbc::iplayer::recommendations", //required
 		DataSourceID:   "IplayerRecommend",              //required
-		StoreType:      libDatabox.StoreTypeTSBlob,      //required
+		StoreType:      libDatabox.StoreTypeKV,          //required
 		IsActuator:     false,
 		IsFunc:         false,
 	}
