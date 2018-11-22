@@ -9,7 +9,7 @@ work in progress
 
 ## Data
 
-This driver will update the users recommendations every hour and store them im a timeseries blob store.
+This driver will update the users recommendations every hour and store them im a KVJSON store datasource: IplayerRecommend key: all.
 
 The data has the following format:
 

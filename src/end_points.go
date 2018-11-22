@@ -49,6 +49,7 @@ func authUser(w http.ResponseWriter, r *http.Request) {
 func logout(w http.ResponseWriter, r *http.Request) {
 	storeClient.KVText.Delete("IplayerCred", "email")
 	storeClient.KVText.Delete("IplayerCred", "password")
+	storeClient.KVJSON.Delete("IplayerRecommend", "all")
 	userAuthenticated = false
 	if isRunning {
 		close(StopChan)

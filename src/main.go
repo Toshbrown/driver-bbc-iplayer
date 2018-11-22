@@ -134,7 +134,7 @@ func setUpWebServer(testMode bool, r *mux.Router, port string) {
 	}
 	if testMode {
 		//set up an http server for testing
-		libDatabox.Info("Waiting for http requests on port http://127.0.0.1" + srv.Addr)
+		libDatabox.Info("Waiting for http requests on port http://" + srv.Addr)
 		log.Fatal(srv.ListenAndServe())
 	} else {
 		//configure tls
@@ -180,7 +180,7 @@ func driverWork(token string, stop chan struct{}) {
 			libDatabox.Err("Error Write Datasource " + err.Error())
 		}
 
-		aerr := storeClient.TSBlobJSON.Write("IplayerRecommend", []byte(recommendations))
+		aerr := storeClient.KVJSON.Write("IplayerRecommend", "all", []byte(recommendations))
 		if aerr != nil {
 			libDatabox.Err("Error Write Datasource " + aerr.Error())
 		}
