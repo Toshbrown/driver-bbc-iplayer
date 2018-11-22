@@ -87,12 +87,12 @@ func registerData() {
 
 	//Setup datastore for main data
 	recomDatasource := libDatabox.DataSourceMetadata{
-		Description:    "IPlayer Recommendation data", //required
-		ContentType:    libDatabox.ContentTypeJSON,    //required
-		Vendor:         "databox-test",                //required
-		DataSourceType: "recommendData",               //required
-		DataSourceID:   "IplayerRecommend",            //required
-		StoreType:      libDatabox.StoreTypeTSBlob,    //required
+		Description:    "IPlayer Recommendation data",   //required
+		ContentType:    libDatabox.ContentTypeJSON,      //required
+		Vendor:         "databox-test",                  //required
+		DataSourceType: "bbc::iplayer::recommendations", //required
+		DataSourceID:   "IplayerRecommend",              //required
+		StoreType:      libDatabox.StoreTypeTSBlob,      //required
 		IsActuator:     false,
 		IsFunc:         false,
 	}

@@ -34,7 +34,7 @@
 
 	"provides": [
 		{
-			"data-source-type": "bbc::iplayer::user_recommendations",
+			"data-source-type": "bbc::iplayer::recommendations",
 			"description": "user iplayer recommendations",
 			"store-type": "tsblob",
 			"schema": {}
