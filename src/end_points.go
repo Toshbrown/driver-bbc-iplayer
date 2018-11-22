@@ -59,7 +59,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
 
 func info(w http.ResponseWriter, r *http.Request) {
 
-	recommendations, err := storeClient.TSBlobJSON.Latest("IplayerRecommend")
+	recommendations, err := storeClient.KVJSON.Read("IplayerRecommend", "all")
 	libDatabox.ChkErr(err)
 
 	var prettyJSON bytes.Buffer
